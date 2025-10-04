@@ -1,15 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Task List</h1>
-<p><a href="#">Create task</a></p>
-<ul>
-    {% for task in tasks %}
-        <li>
-            <a href="#">Title: {{ task.title }}</a>
-            Priority: {{ task.priority }}
-            Status: {{ task.status }}
+<div class="container mt-3">
+    <h1>Task List</h1>
+    <a href="{% url 'task_tracking:task-create' %}" class="btn btn-primary mb-3">Create New Task</a>
+
+    <ul class="list-group">
+        {% for task in tasks %}
+        <li class="list-group-item">
+            <a href="{% url 'task_tracking:task-detail' task.pk %}" class="text-decoration-none">
+                {{ task.title }}
+            </a>
+            <span class="badge bg-primary ms-2">{{ task.status }}</span>
+            <span class="badge bg-secondary ms-1">{{ task.priority }}</span>
         </li>
-    {% empty %}
-        <li>No tasks available.</li>
-    {% endfor %}
+        {% empty %}
+        <li class="list-group-item">No tasks available.</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}
