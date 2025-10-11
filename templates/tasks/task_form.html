@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-3">
-    <h2>{{ view.title }}</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Create Task</button>
-    </form>
+<div class="container mt-4">
+    <h2 class="mb-4">📝 Create task {{ view.title }}</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success mt-3">✅ Create Task</button>
+                <a href="{% url 'task_tracking:task-list' %}" class="btn btn-outline-secondary mt-3 ms-2">← Cancel</a>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

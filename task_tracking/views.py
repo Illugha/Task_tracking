@@ -80,3 +80,10 @@ class TaskCompleteView(LoginRequiredMixin, UserIsOwnerMixin, View):
         task.status = 'done'
         task.save()
         return HttpResponseRedirect(reverse_lazy('task_tracking:task-list'))
+
+class custom_403_view(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'tasks/403.html', status=403)
+
+class CustomLoginView(View):
+    template_name = 'tasks/login.html'
