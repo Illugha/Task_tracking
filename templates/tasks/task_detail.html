@@ -5,6 +5,8 @@
     <p>{{ task.description }}</p>
     <p>Status: <span class="badge bg-primary">{{ task.status }}</span></p>
     <p>Priority: <span class="badge bg-secondary">{{ task.priority }}</span></p>
+    <a href="{% url 'task_tracking:task-update' task.pk %}">Редагувати</a>
+    <a href="{% url 'task_tracking:task-delete' task.pk %}">Видалити</a>
     <a href="{% url 'task_tracking:task-list' %}" class="btn btn-secondary mt-3">Back to Task List</a>
 </div>
 {% endblock %}
