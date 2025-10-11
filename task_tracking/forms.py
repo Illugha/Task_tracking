@@ -5,6 +5,9 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'description', 'status', 'priority', 'deadline']
+        widgets={
+            'deadline': forms.DateInput(attrs={'type': 'date'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super(TaskForm, self).__init__(*args, **kwargs)
@@ -27,8 +30,6 @@ class TaskFilterForm(forms.Form):
     ]
     status = forms.ChoiceField(choices=STATUS_CHOICES, required=False, label='Status')
     priority = forms.ChoiceField(choices=PRIORITY_CHOICES, required=False, label='Priority')
-    deadline_from = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}), label='Deadline From')
-    deadline_to = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}), label='Deadline To')
 
     def __init__(self, *args, **kwargs):
         super(TaskFilterForm, self).__init__(*args, **kwargs)

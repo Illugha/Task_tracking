@@ -8,6 +8,7 @@ urlpatterns = [
     path("<int:pk>/update/", views.TaskUpdateView.as_view(), name="task-update"),
     path('<int:pk>/delete/', views.TaskDeleteView.as_view(), name='task-delete'),
     path('<int:pk>/complete/', views.TaskCompleteView.as_view(), name='task-complete'),
+    path('403/', views.custom_403_view.as_view(), name='custom-403'),
 ]
 
 app_name = 'task_tracking'

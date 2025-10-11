@@ -1,12 +1,26 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-3">
-    <h1>{{ task.title }}</h1>
-    <p>{{ task.description }}</p>
-    <p>Status: <span class="badge bg-primary">{{ task.status }}</span></p>
-    <p>Priority: <span class="badge bg-secondary">{{ task.priority }}</span></p>
-    <a href="{% url 'task_tracking:task-update' task.pk %}">Редагувати</a>
-    <a href="{% url 'task_tracking:task-delete' task.pk %}">Видалити</a>
-    <a href="{% url 'task_tracking:task-list' %}" class="btn btn-secondary mt-3">Back to Task List</a>
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="card-title display-6 mb-3">{{ task.title }}</h1>
+            <p class="card-text">{{ task.description }}</p>
+
+            <p>
+                <strong>Status:</strong>
+                <span class="badge bg-primary">{{ task.status }}</span>
+            </p>
+            <p>
+                <strong>Priority:</strong>
+                <span class="badge bg-warning text-muted">{{ task.priority }}</span>
+            </p>
+
+            <div class="d-flex gap-2 mt-4">
+                <a href="{% url 'task_tracking:task-update' task.pk %}" class="btn btn-outline-primary">✏️ Update</a>
+                <a href="{% url 'task_tracking:task-delete' task.pk %}" class="btn btn-outline-danger">🗑️ Delete</a>
+                <a href="{% url 'task_tracking:task-list' %}" class="btn btn-secondary ms-auto">← Back to Task List</a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,9 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Редагувати завадння</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Оновити завдання</button>
-</form>
+<div class="container mt-4">
+    <h1 class="mb-4">✏️ Edit Task</h1>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary mt-3">💾 Update Task</button>
+                <a href="{% url 'task_tracking:task-list' %}" class="btn btn-outline-secondary mt-3 ms-2">← Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
+ 
