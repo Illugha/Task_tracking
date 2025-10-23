@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from .models import Task
+from .models import Task, Comment, Like
 from django.views.generic import ListView, DetailView, CreateView, View, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from task_tracking.forms import TaskForm, TaskFilterForm
@@ -80,6 +80,49 @@ class TaskCompleteView(LoginRequiredMixin, UserIsOwnerMixin, View):
         task.status = 'done'
         task.save()
         return HttpResponseRedirect(reverse_lazy('task_tracking:task-list'))
+
+class CommentCreateView(LoginRequiredMixin, View):
+    template_name = 'tasks/comment_form.html'
+
+    def get(self, request, *args, **kwargs):
+        task_id = self.kwargs.get('pk')
+        return render(request, self.template_name, {'task_id': task_id})
+
+    def post(self, request, *args, **kwargs):
+        task_id = self.kwargs.get('pk')
+        task = get_object_or_404(Task, pk=task_id)
+
+        content = request.POST.get('content')
+        media = request.FILES.get('media')
+
+        if content:
+            task.comments.create(
+                author=request.user,
+                content=content,
+                media=media
+            )
+        return redirect(self.get_success_url(task.pk))
+    
+    def get_success_url(self, task_id):
+        return reverse_lazy('task_tracking:task-detail', kwargs={'pk': task_id})
+    
+class CommentDeleteView(LoginRequiredMixin, View):
+    template_name = "tasks/comment_confirm_delete.html"
+
+    def get_object(self):
+        comment_id = self.kwargs.get('pk')
+        return get_object_or_404(Comment, pk=comment_id, author=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        comment = self.get_object()
+        return render(request, self.template_name, {'object': comment})
+
+    def post(self, request, *args, **kwargs):
+        comment = self.get_object()
+        task_id = comment.task.pk
+        comment.delete()
+        return redirect('task_tracking:task-detail', pk=task_id)
+
 
 class custom_403_view(View):
     def get(self, request, *args, **kwargs):

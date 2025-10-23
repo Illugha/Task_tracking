@@ -30,3 +30,28 @@ class Task(models.Model):
         ordering = ['-status', 'title']
         verbose_name = 'Task'
         verbose_name_plural = 'Tasks'
+
+class Comment(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    media = models.FileField(upload_to='comments_media/', null=True, blank=True)
+
+    def __str__(self):
+        return f'Comment by {self.author.username} on {self.task.title}'
+    
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
+
+class Like(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_comments')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('task', 'user')
+        verbose_name = 'Like'
+        verbose_name_plural = 'Likes'

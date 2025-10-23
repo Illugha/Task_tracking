@@ -18,7 +18,34 @@
             <div class="d-flex gap-2 mt-4">
                 <a href="{% url 'task_tracking:task-update' task.pk %}" class="btn btn-outline-primary">✏️ Update</a>
                 <a href="{% url 'task_tracking:task-delete' task.pk %}" class="btn btn-outline-danger">🗑️ Delete</a>
+                <a href="{% url 'task_tracking:task-comment' task.pk %}" class="btn btn-outline-secondary">💬 Add Comment</a>
                 <a href="{% url 'task_tracking:task-list' %}" class="btn btn-secondary ms-auto">← Back to Task List</a>
+            </div>
+
+            <hr class="my-4">
+
+            <h3 class="mb-3">Comments</h3>
+            <div class="list-group">
+                {% for comment in task.comments.all %}
+                    <div class="list-group-item mb-3">
+                        <p class="mb-1">{{ comment.content }}</p>
+                        {% if comment.media %}
+                            <div class="mt-2">
+                                <a href="{{ comment.media.url }}" target="_blank">📎 View Attachment</a>
+                            </div>
+                        {% endif %}
+                        <small class="text-muted">
+                            By {{ comment.author.username }} on {{ comment.created_at|date:"M d, Y H:i" }}
+                        </small>
+                        {% if request.user == comment.author %}
+                            <div class="mt-2">
+                                <a href="{% url 'task_tracking:comment-delete' comment.pk %}" class="btn btn-sm btn-outline-danger">🗑️ Delete Comment</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <div class="text-muted">No comments yet.</div>
+                {% endfor %}
             </div>
         </div>
     </div>
