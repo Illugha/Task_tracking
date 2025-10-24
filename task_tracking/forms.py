@@ -1,5 +1,5 @@
 from django import forms
-from task_tracking.models import Task
+from task_tracking.models import Task, Comment
 
 class TaskForm(forms.ModelForm):
     class Meta:
@@ -35,3 +35,14 @@ class TaskFilterForm(forms.Form):
         super(TaskFilterForm, self).__init__(*args, **kwargs)
         self.fields['status'].widget.attrs.update({'class': 'form-control'})
         self.fields['priority'].widget.attrs.update({'class': 'form-control'})
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content', 'media']
+        widgets = {"media": forms.FileInput()}
+
+    def __init__(self, *args, **kwargs):
+        super(CommentForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class': 'form-control'})

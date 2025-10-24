@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from .models import Task, Comment, Like
 from django.views.generic import ListView, DetailView, CreateView, View, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from task_tracking.forms import TaskForm, TaskFilterForm
+from task_tracking.forms import TaskForm, TaskFilterForm, CommentForm
 from task_tracking.mixins import UserIsOwnerMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -36,6 +36,22 @@ class TaskDetailView(DetailView):
     model = Task
     context_object_name = 'task'
     template_name = 'tasks/task_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comment_form'] = CommentForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        comment_form = CommentForm(request.POST, request.FILES)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.author = request.user
+            comment.task = self.get_object()
+            comment.save()
+            return redirect('task_tracking:task-detail', pk=comment.task.pk)
+        else:
+            pass
 
 class TaskCreateView(LoginRequiredMixin, CreateView):
     model = Task
@@ -80,31 +96,6 @@ class TaskCompleteView(LoginRequiredMixin, UserIsOwnerMixin, View):
         task.status = 'done'
         task.save()
         return HttpResponseRedirect(reverse_lazy('task_tracking:task-list'))
-
-class CommentCreateView(LoginRequiredMixin, View):
-    template_name = 'tasks/comment_form.html'
-
-    def get(self, request, *args, **kwargs):
-        task_id = self.kwargs.get('pk')
-        return render(request, self.template_name, {'task_id': task_id})
-
-    def post(self, request, *args, **kwargs):
-        task_id = self.kwargs.get('pk')
-        task = get_object_or_404(Task, pk=task_id)
-
-        content = request.POST.get('content')
-        media = request.FILES.get('media')
-
-        if content:
-            task.comments.create(
-                author=request.user,
-                content=content,
-                media=media
-            )
-        return redirect(self.get_success_url(task.pk))
-    
-    def get_success_url(self, task_id):
-        return reverse_lazy('task_tracking:task-detail', kwargs={'pk': task_id})
     
 class CommentDeleteView(LoginRequiredMixin, View):
     template_name = "tasks/comment_confirm_delete.html"
