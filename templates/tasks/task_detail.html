@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+{% load custom_tags %}
 <div class="container mt-4">
     <div class="card shadow-sm">
         <div class="card-body">
@@ -38,8 +39,17 @@
                     <div class="list-group-item mb-3">
                         <p class="mb-1">{{ comment.content }}</p>
                         {% if comment.media %}
-                            <div class="mt-2">
-                                <a href="{{ comment.media.url }}" target="_blank">📎 View Attachment</a>
+                            <div class="comment-media">
+                                {% if comment.media.url|endswith:".jpg" or comment.media.url|endswith:".png" or comment.media.url|endswith:".jpeg" %}
+                                    <img src="{{ comment.media.url }}" alt="Зображення коментаря" style="max-width: 1000px;">
+                                {% elif comment.media.url|endswith:".mp4" %}
+                                    <video width="320" height="240" controls>
+                                        <source src="{{ comment.media.url }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                {% else %}
+                                    <a href="{{ comment.media.url }}">Завантажити файл</a>
+                                {% endif %}
                             </div>
                         {% endif %}
                         <small class="text-muted">
@@ -50,6 +60,12 @@
                                 <a href="{% url 'task_tracking:comment-delete' comment.pk %}" class="btn btn-sm btn-outline-danger">🗑️ Delete Comment</a>
                             </div>
                         {% endif %}
+                        <form action="{% url 'task_tracking:comment-like-toggle' comment.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-primary {% if request.user in comment.likes.all %}btn-success{% else %}btn-outline-success{% endif %}">
+                                Like ({{ comment.likes.count }})
+                            </button>
+                        </form>
                     </div>
                 {% empty %}
                     <div class="text-muted">No comments yet.</div>
