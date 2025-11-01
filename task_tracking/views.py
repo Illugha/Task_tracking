@@ -1,12 +1,18 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from .models import Task, Comment, Like
+from task_tracking.models import Task, Comment  
 from django.views.generic import ListView, DetailView, CreateView, View, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from task_tracking.forms import TaskForm, TaskFilterForm, CommentForm
+from task_tracking.forms import TaskForm, TaskFilterForm, CommentForm, UserLoginForm, UserRegistrationForm
 from task_tracking.mixins import UserIsOwnerMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
+from task_tracking import models
+
 
 # List of existing tasks
 class TaskListView(ListView):
@@ -121,3 +127,31 @@ class custom_403_view(View):
 
 class CustomLoginView(View):
     template_name = 'tasks/login.html'
+    form_class = UserLoginForm
+
+class CustomLoginView(LoginView):
+    template_name = 'tasks/login.html'
+    redirect_authenticated_user = True
+
+class CustomLogoutView(LogoutView):
+    next_page = "task_tracking:login"
+
+class RegisterView(CreateView):
+    template_name = 'tasks/register.html'
+    form_class = UserRegistrationForm
+    success_url = reverse_lazy('task_tracking:login')
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect(self.success_url)
+
+class CommentLikeToggle(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        comment = get_object_or_404(models.Comment, pk=self.kwargs.get('pk'))
+        like_qs = models.Like.objects.filter(comment=comment, user=request.user)
+        if like_qs.exists():
+            like_qs.delete()
+        else:
+            models.Like.objects.create(comment=comment, user=request.user)
+        return HttpResponseRedirect(comment.get_absolute_url())

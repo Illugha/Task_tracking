@@ -41,17 +41,21 @@ class Comment(models.Model):
     def __str__(self):
         return f'Comment by {self.author.username} on {self.task.title}'
     
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('task_tracking:task-detail', args=[str(self.task.id)])
+    
     class Meta:
         ordering = ['created_at']
         verbose_name = 'Comment'
         verbose_name_plural = 'Comments'
 
 class Like(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='likes')
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_comments')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('task', 'user')
+        unique_together = ('comment', 'user')
         verbose_name = 'Like'
         verbose_name_plural = 'Likes'
